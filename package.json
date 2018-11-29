@@ -1,0 +1,22 @@
+{
+  "name": "user-authentication",
+  "version": "1.0.0",
+  "description": "Test project to get familiar with user authentication via passport.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Camille HAGENBOURGER",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "mongodb": "^3.1.10",
+    "mongoose": "^5.3.14",
+    "passport": "^0.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
