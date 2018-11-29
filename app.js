@@ -1,13 +1,28 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-
-//enables CORS (facultative)
-var cors = require('cors');
-app.use(cors({ optionSuccessStatus: 200 }));
+const session = require('express-session');
+const passport = require('passport');
+const User = require('./models/user.model');
+const LocalStrategy = require('passport-local');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const authFunctions = require('./controllers/functions/auth.functions');
+const dbFunctions = require('./controllers/functions/database.functions');
+require('dotenv').config();
 
 // app setup
-app.use(bodyParser.urlencoded({extended: false}));
+app.use('/', express.static(__dirname));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(session({
+    secret: process.env.EXPRESS_SECRET,
+    resave: true,
+    saveUninitialized: true,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(cors({ optionSuccessStatus: 200 }));
 
 //Mongoose setup
 const mongoose = require('mongoose');
@@ -22,6 +37,30 @@ db.once('open', () => {
     //configuring the listening port
     const listener = app.listen(process.env.PORT || 3000, function () {
         console.log('Your app is listening on port ' + listener.address().port);
+    });
+});
+
+//authentication middlewares
+passport.use(new LocalStrategy(
+    async function (username, password, done) {
+        //checks that user exists
+        let user = await dbFunctions.check_user_by_username(username);
+        if (!user) { return done(null, false); }
+
+        //checks that password matches with registered hash
+        let match = await authFunctions.verifyPassword(password, user.password);
+        if (!match) { return done(null, false); }
+        return done(null, user);
+    }
+))
+
+passport.serializeUser(function (user, done) {
+    done(null, user._id);
+});
+
+passport.deserializeUser(function (id, done) {
+    User.findById(id, function (err, user) {
+        done(err, user);
     });
 });
 
@@ -41,6 +80,6 @@ app.use('/user', userRoutes);
 //404 errors
 app.use((req, res, next) => {
     res.status(404)
-      .type('text')
-      .send('Not Found');
-  });
+        .type('text')
+        .send('Not Found');
+});

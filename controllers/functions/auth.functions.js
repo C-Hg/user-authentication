@@ -1,15 +1,27 @@
 const bcrypt = require('bcrypt');
 
 exports.hash_password = async function (password) {
-    try {
-        const hashedPassword = await new Promise((resolve, reject) => {
-            bcrypt.hash(password, 12, function handleEncrypt(err, hash) {
-                if (err) reject (err);
-                resolve(hash);
-            })
-        })
-        return hashedPassword;
+    try{
+        const hashed = await bcrypt.hash(password, 12)
+        return hashed;
     } catch (e) {
         console.log("error while hashing password");
     }
 }
+
+exports.ensureAuthenticated = function (req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/');
+  };
+
+  exports.verifyPassword = async function (password, passwordHash){
+    try{
+        const match = await bcrypt.compare(password, passwordHash)
+        console.log(match);
+        return match;
+    } catch (e) {
+        console.log("error while hashing password");
+    }
+  }
