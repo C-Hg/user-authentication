@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const dbFunctions = require('./functions/database.functions');
+const authFunctions = require('./functions/auth.functions');
 
 exports.add_new_user = async function(req, res) {
     //if username already taken, return error message
@@ -10,8 +11,8 @@ exports.add_new_user = async function(req, res) {
     }
         
     //create user with hashed password
-    let user = await dbFunctions.create_user(req.body.username, req.body.password);
-    console.log(user);
+    let hashedPassword = await authFunctions.hash_password(req.body.password);
+    let user = await dbFunctions.create_user(req.body.username, hashedPassword);
     res.send(user);
     return
     //login user and redirect to /profile

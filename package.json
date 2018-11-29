@@ -22,5 +22,8 @@
   "repository": {
     "type": "git",
     "url": ""
+  },
+  "devDependencies": {
+    "dotenv": "^6.1.0"
   }
 }
