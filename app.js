@@ -55,15 +55,19 @@ passport.use(new LocalStrategy(
 ))
 
 passport.serializeUser(function (user, done) {
+
     done(null, user._id);
 });
 
-passport.deserializeUser(function (id, done) {
-    User.findById(id, function (err, user) {
-        done(err, user);
+passport.deserializeUser(async function (id, done) {
+    await User.findById(id, function (err, user) {
+        if (err) return err;
+        done(null, user);
     });
 });
 
+//controls cookies after auth middlewares
+app.use(authFunctions.cookieSetter); 
 
 //home routing
 app.get("/", function (req, res) {

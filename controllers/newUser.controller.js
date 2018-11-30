@@ -11,7 +11,6 @@ exports.add_new_user = async function(req, res, next) {
         
     //create user with hashed password
     let hashedPassword = await authFunctions.hash_password(req.body.password);
-    let user = await dbFunctions.create_user(req.body.username, hashedPassword);
-    
+    await dbFunctions.create_user(req.body.username, hashedPassword);   
     next();
 }

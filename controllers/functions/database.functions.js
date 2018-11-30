@@ -10,7 +10,6 @@ exports.check_user_by_username = async function (username) {
         console.log("error while checking db");
         return
     }
-
 }
 
 exports.create_user = async function (username, hash) { 
