@@ -4,6 +4,7 @@
 <head>
     <!-- metadata elements -->
     <title>User authentication</title>
+    <script src="../views/script.js"></script>
 </head>
 
 <header>
@@ -15,8 +16,12 @@
         <p>Hello <span id="username"></span> !</p>
         <hr>
         <form action="/" method="GET">
-        <button id="submit" type="submit">Home</button>
-        </form> 
+            <button id="submit" type="submit">Home</button>
+        </form>
+        <hr>
+        <form action="/auth/logout" method="GET">
+            <button id="submit" type="submit">Logout</button>
+        </form>
     </main>
 </body>
 <footer>

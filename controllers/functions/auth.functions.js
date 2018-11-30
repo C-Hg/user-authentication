@@ -25,19 +25,20 @@ exports.verifyPassword = async function (password, passwordHash) {
     }
 }
 
-exports.cookieSetter = function (req, res, next) {
+exports.setCookie = function (req, res, next) {
     // check if client sent cookie and is authenticated
     let cookie = req.cookies.username;
     if (cookie === undefined && req.user)
     {
       // no: set a new cookie
-      res.cookie('username', req.user.username, { maxAge: 9000000, httpOnly: true });
-      console.log('cookie created successfully');
-    } 
-    else
-    {
-      // yes, cookie was already present 
-      console.log('cookie exists or username undefined', cookie);
+      res.cookie('username', req.user.username, { maxAge: 9000000, httpOnly: false, sameSite: true });
     } 
     next(); // <-- important!
 };
+
+exports.deleteCookie = function (req, res, next) {
+    let cookie = req.cookies.username;
+    if (cookie){
+        res.clearCookie('username');
+    }
+}

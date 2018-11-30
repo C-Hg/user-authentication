@@ -11,14 +11,17 @@ const authFunctions = require('./controllers/functions/auth.functions');
 const dbFunctions = require('./controllers/functions/database.functions');
 require('dotenv').config();
 
+// serving static files
+app.use('/views', express.static(process.cwd() + '/views'));
+
 // app setup
-app.use('/', express.static(__dirname));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
     secret: process.env.EXPRESS_SECRET,
     resave: true,
     saveUninitialized: true,
+    cookie: { sameSite: true, httpOnly: true}
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -55,19 +58,18 @@ passport.use(new LocalStrategy(
 ))
 
 passport.serializeUser(function (user, done) {
-
-    done(null, user._id);
+    done(null, user.id);
 });
 
-passport.deserializeUser(async function (id, done) {
-    await User.findById(id, function (err, user) {
+passport.deserializeUser(function (id, done) {
+    User.findById(id, function (err, user) {
         if (err) return err;
         done(null, user);
     });
 });
 
 //controls cookies after auth middlewares
-app.use(authFunctions.cookieSetter); 
+app.use(authFunctions.setCookie); 
 
 //home routing
 app.get("/", function (req, res) {
@@ -79,7 +81,7 @@ const authRoutes = require('./routes/auth.route')
 const userRoutes = require('./routes/user.route')
 
 app.use("/auth", authRoutes);
-app.use('/user', userRoutes);
+app.use("/user", userRoutes);
 
 //404 errors
 app.use((req, res, next) => {
